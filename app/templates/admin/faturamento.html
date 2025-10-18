@@ -1,0 +1,65 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Faturamento{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-8">Faturamento</h1>
+    
+    <div class="bg-white rounded-lg shadow-lg p-6 mb-8">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-xl font-bold text-gray-800">Período</h3>
+            <div class="flex space-x-2">
+                <a href="{{ url_for('admin.faturamento', periodo='diario') }}" 
+                   class="px-4 py-2 {% if periodo == 'diario' %}bg-indigo-600 text-white{% else %}bg-gray-200 text-gray-700{% endif %} rounded-lg">
+                    Hoje
+                </a>
+                <a href="{{ url_for('admin.faturamento', periodo='semanal') }}" 
+                   class="px-4 py-2 {% if periodo == 'semanal' %}bg-indigo-600 text-white{% else %}bg-gray-200 text-gray-700{% endif %} rounded-lg">
+                    7 Dias
+                </a>
+                <a href="{{ url_for('admin.faturamento', periodo='mensal') }}" 
+                   class="px-4 py-2 {% if periodo == 'mensal' %}bg-indigo-600 text-white{% else %}bg-gray-200 text-gray-700{% endif %} rounded-lg">
+                    30 Dias
+                </a>
+            </div>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <p class="text-gray-600 mb-2">Total Vendido</p>
+            <p class="text-3xl font-bold text-indigo-600">R$ {{ "%.2f"|format(total_vendido) }}</p>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <p class="text-gray-600 mb-2">Comissão ({{ comissao_percentual }}%)</p>
+            <p class="text-3xl font-bold text-yellow-600">R$ {{ "%.2f"|format(comissao_valor) }}</p>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <p class="text-gray-600 mb-2">Lucro Líquido</p>
+            <p class="text-3xl font-bold text-green-600">R$ {{ "%.2f"|format(lucro_liquido) }}</p>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <a href="{{ url_for('admin.exportar_csv', periodo=periodo) }}" 
+               class="block w-full bg-indigo-600 text-white text-center py-3 rounded-lg hover:bg-indigo-700">
+                <i class="fas fa-download mr-2"></i>Exportar CSV
+            </a>
+        </div>
+    </div>
+    
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Vendas por Categoria</h3>
+        <div class="space-y-3">
+            {% for venda in vendas_por_categoria %}
+            <div class="flex justify-between items-center border-b border-gray-200 pb-3">
+                <span class="text-gray-700 font-semibold">{{ venda.nome }}</span>
+                <span class="text-xl font-bold text-indigo-600">R$ {{ "%.2f"|format(venda.total) }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

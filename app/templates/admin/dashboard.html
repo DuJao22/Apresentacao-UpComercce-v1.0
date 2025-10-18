@@ -1,0 +1,137 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Painel Administrativo{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-8">Painel Administrativo</h1>
+    
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
+        <div class="bg-white rounded-lg shadow-lg p-4 md:p-6">
+            <div class="flex items-center">
+                <i class="fas fa-users text-3xl md:text-4xl text-indigo-600 mr-3 md:mr-4"></i>
+                <div class="min-w-0 flex-1">
+                    <p class="text-sm md:text-base text-gray-600">Clientes</p>
+                    <p class="text-2xl md:text-3xl font-bold truncate">{{ total_usuarios }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-4 md:p-6">
+            <div class="flex items-center">
+                <i class="fas fa-box text-3xl md:text-4xl text-green-600 mr-3 md:mr-4"></i>
+                <div class="min-w-0 flex-1">
+                    <p class="text-sm md:text-base text-gray-600">Produtos</p>
+                    <p class="text-2xl md:text-3xl font-bold truncate">{{ total_produtos }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-4 md:p-6">
+            <div class="flex items-center">
+                <i class="fas fa-shopping-cart text-3xl md:text-4xl text-blue-600 mr-3 md:mr-4"></i>
+                <div class="min-w-0 flex-1">
+                    <p class="text-sm md:text-base text-gray-600">Pedidos</p>
+                    <p class="text-2xl md:text-3xl font-bold truncate">{{ total_pedidos }}</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-4 md:p-6">
+            <div class="flex items-center">
+                <i class="fas fa-dollar-sign text-3xl md:text-4xl text-yellow-600 mr-3 md:mr-4"></i>
+                <div class="min-w-0 flex-1">
+                    <p class="text-sm md:text-base text-gray-600">Total Vendido</p>
+                    <p class="text-lg md:text-2xl font-bold break-words">R$ {{ "%.2f"|format(total_vendido) }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
+        <div class="bg-white rounded-lg shadow-lg p-4 md:p-6">
+            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4">Pedidos Recentes</h3>
+            <div class="space-y-3">
+                {% for pedido in pedidos_recentes %}
+                <div class="border-b border-gray-200 pb-3 last:border-b-0">
+                    <div class="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-2">
+                        <div class="min-w-0 flex-1">
+                            <p class="font-semibold text-sm md:text-base truncate">#{{ pedido.id }} - {{ pedido.cliente_nome }}</p>
+                            <p class="text-xs md:text-sm text-gray-600">{{ pedido.criado_em }}</p>
+                        </div>
+                        <div class="flex items-center gap-2 sm:text-right sm:flex-col sm:items-end">
+                            <p class="font-bold text-indigo-600 text-sm md:text-base">R$ {{ "%.2f"|format(pedido.total) }}</p>
+                            <span class="text-xs px-2 py-1 rounded-full whitespace-nowrap
+                                {% if pedido.status == 'pendente' %}bg-yellow-100 text-yellow-800
+                                {% elif pedido.status == 'aprovado' %}bg-green-100 text-green-800
+                                {% else %}bg-blue-100 text-blue-800{% endif %}">
+                                {{ pedido.status|title }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <a href="{{ url_for('admin.pedidos') }}" class="block mt-4 text-center text-indigo-600 hover:underline font-semibold">
+                Ver todos os pedidos
+            </a>
+        </div>
+        
+        <div class="bg-white rounded-lg shadow-lg p-4 md:p-6">
+            <h3 class="text-lg md:text-xl font-bold text-gray-800 mb-4">Produtos com Estoque Baixo</h3>
+            <div class="space-y-3">
+                {% for produto in produtos_baixo_estoque %}
+                <div class="border-b border-gray-200 pb-3 last:border-b-0">
+                    <div class="flex justify-between items-center gap-3">
+                        <div class="min-w-0 flex-1">
+                            <p class="font-semibold text-sm md:text-base truncate">{{ produto.nome }}</p>
+                            <p class="text-xs md:text-sm text-gray-600 truncate">{{ produto.categoria_nome }}</p>
+                        </div>
+                        <span class="px-2 md:px-3 py-1 bg-red-100 text-red-800 rounded-full text-xs md:text-sm font-semibold whitespace-nowrap">
+                            {{ produto.quantidade_estoque }} un.
+                        </span>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            <a href="{{ url_for('admin.produtos') }}" class="block mt-4 text-center text-indigo-600 hover:underline font-semibold">
+                Ver todos os produtos
+            </a>
+        </div>
+    </div>
+    
+    <div class="mt-8 bg-white rounded-lg shadow-lg p-4 md:p-6">
+        <h3 class="text-xl font-bold text-gray-800 mb-4">Menu Administrativo</h3>
+        <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-7 gap-3 md:gap-4">
+            <a href="{{ url_for('admin.usuarios') }}" class="p-3 md:p-4 bg-indigo-100 rounded-lg hover:bg-indigo-200 text-center transition-colors">
+                <i class="fas fa-users text-xl md:text-2xl text-indigo-600 mb-1 md:mb-2"></i>
+                <p class="font-semibold text-gray-800 text-sm md:text-base">Usuários</p>
+            </a>
+            <a href="{{ url_for('admin.categorias') }}" class="p-3 md:p-4 bg-green-100 rounded-lg hover:bg-green-200 text-center transition-colors">
+                <i class="fas fa-list text-xl md:text-2xl text-green-600 mb-1 md:mb-2"></i>
+                <p class="font-semibold text-gray-800 text-sm md:text-base">Categorias</p>
+            </a>
+            <a href="{{ url_for('admin.produtos') }}" class="p-3 md:p-4 bg-blue-100 rounded-lg hover:bg-blue-200 text-center transition-colors">
+                <i class="fas fa-box text-xl md:text-2xl text-blue-600 mb-1 md:mb-2"></i>
+                <p class="font-semibold text-gray-800 text-sm md:text-base">Produtos</p>
+            </a>
+            <a href="{{ url_for('admin.pedidos') }}" class="p-3 md:p-4 bg-yellow-100 rounded-lg hover:bg-yellow-200 text-center transition-colors">
+                <i class="fas fa-shopping-cart text-xl md:text-2xl text-yellow-600 mb-1 md:mb-2"></i>
+                <p class="font-semibold text-gray-800 text-sm md:text-base">Pedidos</p>
+            </a>
+            <a href="{{ url_for('admin.faturamento') }}" class="p-3 md:p-4 bg-purple-100 rounded-lg hover:bg-purple-200 text-center transition-colors">
+                <i class="fas fa-chart-line text-xl md:text-2xl text-purple-600 mb-1 md:mb-2"></i>
+                <p class="font-semibold text-gray-800 text-sm md:text-base">Faturamento</p>
+            </a>
+            <a href="{{ url_for('admin.logs') }}" class="p-3 md:p-4 bg-red-100 rounded-lg hover:bg-red-200 text-center transition-colors">
+                <i class="fas fa-history text-xl md:text-2xl text-red-600 mb-1 md:mb-2"></i>
+                <p class="font-semibold text-gray-800 text-sm md:text-base">Logs</p>
+            </a>
+            <a href="{{ url_for('admin.configuracoes') }}" class="p-3 md:p-4 bg-orange-100 rounded-lg hover:bg-orange-200 text-center transition-colors">
+                <i class="fas fa-cog text-xl md:text-2xl text-orange-600 mb-1 md:mb-2"></i>
+                <p class="font-semibold text-gray-800 text-sm md:text-base">Configurações</p>
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

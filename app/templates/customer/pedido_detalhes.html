@@ -1,0 +1,240 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Detalhes do Pedido #{{ pedido.id }}{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8 flex items-center justify-between">
+        <div>
+            <a href="{{ url_for('customer.pedidos') }}" class="text-indigo-600 hover:text-indigo-700 font-medium mb-2 inline-block">
+                <i class="fas fa-arrow-left mr-2"></i> Voltar para Pedidos
+            </a>
+            <h1 class="text-3xl font-bold text-gray-800">Pedido #{{ pedido.id }}</h1>
+        </div>
+        {% if pedido.status == 'pendente' %}
+        <form method="POST" action="{{ url_for('customer.cancelar_pedido', id=pedido.id) }}" onsubmit="return confirm('Tem certeza que deseja cancelar este pedido?')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="bg-red-600 text-white px-6 py-2 rounded-lg hover:bg-red-700 transition font-medium">
+                <i class="fas fa-times mr-2"></i> Cancelar Pedido
+            </button>
+        </form>
+        {% endif %}
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Status do Pedido</h2>
+                <div class="relative">
+                    {% if pedido.tipo_entrega == 'retirada' %}
+                    {# Timeline para RETIRADA #}
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex flex-col items-center text-center flex-1">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mb-2 
+                                {% if pedido.status in ['pendente', 'confirmado', 'em_separacao', 'pronto_retirada', 'retirado'] %}bg-green-500 text-white{% else %}bg-gray-300 text-gray-600{% endif %}">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <p class="text-sm font-medium text-gray-700">Pedido<br>Realizado</p>
+                        </div>
+                        
+                        <div class="flex-1 h-1 mx-2 {% if pedido.status in ['confirmado', 'em_separacao', 'pronto_retirada', 'retirado'] %}bg-green-500{% else %}bg-gray-300{% endif %}"></div>
+                        
+                        <div class="flex flex-col items-center text-center flex-1">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mb-2 
+                                {% if pedido.status in ['confirmado', 'em_separacao', 'pronto_retirada', 'retirado'] %}bg-green-500 text-white{% else %}bg-gray-300 text-gray-600{% endif %}">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                            <p class="text-sm font-medium text-gray-700">Aprovado</p>
+                        </div>
+                        
+                        <div class="flex-1 h-1 mx-2 {% if pedido.status in ['em_separacao', 'pronto_retirada', 'retirado'] %}bg-green-500{% else %}bg-gray-300{% endif %}"></div>
+                        
+                        <div class="flex flex-col items-center text-center flex-1">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mb-2 
+                                {% if pedido.status in ['em_separacao', 'pronto_retirada', 'retirado'] %}bg-green-500 text-white{% else %}bg-gray-300 text-gray-600{% endif %}">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <p class="text-sm font-medium text-gray-700">Em<br>Separação</p>
+                        </div>
+                        
+                        <div class="flex-1 h-1 mx-2 {% if pedido.status in ['pronto_retirada', 'retirado'] %}bg-green-500{% else %}bg-gray-300{% endif %}"></div>
+                        
+                        <div class="flex flex-col items-center text-center flex-1">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mb-2 
+                                {% if pedido.status in ['pronto_retirada', 'retirado'] %}bg-green-500 text-white{% else %}bg-gray-300 text-gray-600{% endif %}">
+                                <i class="fas fa-box-open"></i>
+                            </div>
+                            <p class="text-sm font-medium text-gray-700">Pronto</p>
+                        </div>
+                        
+                        <div class="flex-1 h-1 mx-2 {% if pedido.status == 'retirado' %}bg-green-500{% else %}bg-gray-300{% endif %}"></div>
+                        
+                        <div class="flex flex-col items-center text-center flex-1">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mb-2 
+                                {% if pedido.status == 'retirado' %}bg-green-500 text-white{% else %}bg-gray-300 text-gray-600{% endif %}">
+                                <i class="fas fa-store"></i>
+                            </div>
+                            <p class="text-sm font-medium text-gray-700">Retirado</p>
+                        </div>
+                    </div>
+                    {% else %}
+                    {# Timeline para ENTREGA #}
+                    <div class="flex items-center justify-between mb-8">
+                        <div class="flex flex-col items-center text-center flex-1">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mb-2 
+                                {% if pedido.status in ['pendente', 'confirmado', 'em_separacao', 'saiu_entrega', 'entregue'] %}bg-green-500 text-white{% else %}bg-gray-300 text-gray-600{% endif %}">
+                                <i class="fas fa-check"></i>
+                            </div>
+                            <p class="text-sm font-medium text-gray-700">Pedido<br>Realizado</p>
+                        </div>
+                        
+                        <div class="flex-1 h-1 mx-2 {% if pedido.status in ['confirmado', 'em_separacao', 'saiu_entrega', 'entregue'] %}bg-green-500{% else %}bg-gray-300{% endif %}"></div>
+                        
+                        <div class="flex flex-col items-center text-center flex-1">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mb-2 
+                                {% if pedido.status in ['confirmado', 'em_separacao', 'saiu_entrega', 'entregue'] %}bg-green-500 text-white{% else %}bg-gray-300 text-gray-600{% endif %}">
+                                <i class="fas fa-check-double"></i>
+                            </div>
+                            <p class="text-sm font-medium text-gray-700">Aprovado</p>
+                        </div>
+                        
+                        <div class="flex-1 h-1 mx-2 {% if pedido.status in ['em_separacao', 'saiu_entrega', 'entregue'] %}bg-green-500{% else %}bg-gray-300{% endif %}"></div>
+                        
+                        <div class="flex flex-col items-center text-center flex-1">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mb-2 
+                                {% if pedido.status in ['em_separacao', 'saiu_entrega', 'entregue'] %}bg-green-500 text-white{% else %}bg-gray-300 text-gray-600{% endif %}">
+                                <i class="fas fa-box"></i>
+                            </div>
+                            <p class="text-sm font-medium text-gray-700">Em<br>Separação</p>
+                        </div>
+                        
+                        <div class="flex-1 h-1 mx-2 {% if pedido.status in ['saiu_entrega', 'entregue'] %}bg-green-500{% else %}bg-gray-300{% endif %}"></div>
+                        
+                        <div class="flex flex-col items-center text-center flex-1">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mb-2 
+                                {% if pedido.status in ['saiu_entrega', 'entregue'] %}bg-green-500 text-white{% else %}bg-gray-300 text-gray-600{% endif %}">
+                                <i class="fas fa-shipping-fast"></i>
+                            </div>
+                            <p class="text-sm font-medium text-gray-700">Enviado</p>
+                        </div>
+                        
+                        <div class="flex-1 h-1 mx-2 {% if pedido.status == 'entregue' %}bg-green-500{% else %}bg-gray-300{% endif %}"></div>
+                        
+                        <div class="flex flex-col items-center text-center flex-1">
+                            <div class="w-12 h-12 rounded-full flex items-center justify-center mb-2 
+                                {% if pedido.status == 'entregue' %}bg-green-500 text-white{% else %}bg-gray-300 text-gray-600{% endif %}">
+                                <i class="fas fa-home"></i>
+                            </div>
+                            <p class="text-sm font-medium text-gray-700">Entregue</p>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-sm text-gray-600">Status Atual:</p>
+                    <p class="text-lg font-bold 
+                        {% if pedido.status == 'pendente' %}text-yellow-600
+                        {% elif pedido.status == 'confirmado' %}text-green-600
+                        {% elif pedido.status == 'em_separacao' %}text-blue-600
+                        {% elif pedido.status in ['pronto_retirada', 'saiu_entrega'] %}text-indigo-600
+                        {% elif pedido.status in ['entregue', 'retirado'] %}text-green-700
+                        {% elif pedido.status == 'cancelado' %}text-red-600
+                        {% else %}text-gray-600{% endif %}">
+                        {% if pedido.status == 'pendente' %}Pendente
+                        {% elif pedido.status == 'confirmado' %}Confirmado
+                        {% elif pedido.status == 'em_separacao' %}Em Separação
+                        {% elif pedido.status == 'pronto_retirada' %}Pronto para Retirada
+                        {% elif pedido.status == 'saiu_entrega' %}Saiu para Entrega
+                        {% elif pedido.status == 'entregue' %}Entregue
+                        {% elif pedido.status == 'retirado' %}Retirado
+                        {% elif pedido.status == 'cancelado' %}Cancelado
+                        {% else %}{{ pedido.status|title }}{% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Itens do Pedido</h2>
+                <div class="space-y-4">
+                    {% for item in itens %}
+                    <div class="flex items-center gap-4 p-4 border border-gray-200 rounded-lg hover:shadow-md transition">
+                        {% if item.imagem_principal %}
+                        <img src="{{ url_for('static', filename=item.imagem_principal) }}" 
+                             alt="{{ item.produto_nome }}" 
+                             class="w-20 h-20 object-cover rounded-lg">
+                        {% else %}
+                        <div class="w-20 h-20 bg-gray-200 rounded-lg flex items-center justify-center">
+                            <i class="fas fa-image text-3xl text-gray-400"></i>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="flex-1">
+                            <h3 class="font-bold text-gray-800">{{ item.produto_nome }}</h3>
+                            <p class="text-sm text-gray-600">SKU: {{ item.sku }}</p>
+                            <p class="text-sm text-gray-600">Quantidade: {{ item.quantidade }}</p>
+                        </div>
+                        
+                        <div class="text-right">
+                            <p class="text-sm text-gray-600">Preço Unit.</p>
+                            <p class="font-medium text-gray-800">R$ {{ "%.2f"|format(item.preco_unitario) }}</p>
+                        </div>
+                        
+                        <div class="text-right">
+                            <p class="text-sm text-gray-600">Subtotal</p>
+                            <p class="text-lg font-bold text-indigo-600">R$ {{ "%.2f"|format(item.subtotal) }}</p>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Resumo do Pedido</h3>
+                <div class="space-y-3 mb-4">
+                    <div class="flex justify-between text-gray-600">
+                        <span>Data do Pedido:</span>
+                        <span class="font-medium">{{ pedido.criado_em }}</span>
+                    </div>
+                    <div class="flex justify-between text-gray-600">
+                        <span>Método de Pagamento:</span>
+                        <span class="font-medium">{{ pedido.metodo_pagamento|title }}</span>
+                    </div>
+                    <div class="flex justify-between text-gray-600">
+                        <span>Tipo de Entrega:</span>
+                        <span class="font-medium">{{ pedido.tipo_entrega|title }}</span>
+                    </div>
+                </div>
+                
+                <div class="border-t border-gray-200 pt-4">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xl font-bold text-gray-800">Total:</span>
+                        <span class="text-2xl font-bold text-indigo-600">R$ {{ "%.2f"|format(pedido.total) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            {% if pedido.endereco_entrega %}
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Endereço de Entrega</h3>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <i class="fas fa-map-marker-alt text-indigo-600 mr-2"></i>
+                    <span class="text-gray-700">{{ pedido.endereco_entrega }}</span>
+                </div>
+            </div>
+            {% endif %}
+
+            {% if pedido.observacoes %}
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Observações</h3>
+                <div class="bg-gray-50 rounded-lg p-4">
+                    <p class="text-gray-700">{{ pedido.observacoes }}</p>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

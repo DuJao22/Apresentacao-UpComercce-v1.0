@@ -1,0 +1,186 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Minha Conta - Dashboard{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+        <div class="flex items-center justify-between flex-wrap gap-4">
+            <div>
+                <h1 class="text-3xl font-bold text-gray-800">Olá, {{ user.nome.split()[0] }}!</h1>
+                <p class="text-gray-600 mt-2">Bem-vindo à sua área do cliente</p>
+            </div>
+            <div class="bg-white rounded-lg shadow-md px-4 py-2 border border-gray-200">
+                <div class="flex items-center gap-2">
+                    <i class="fas fa-shield-alt text-indigo-600"></i>
+                    <span class="text-sm font-medium text-gray-600">Status:</span>
+                    <span class="px-2 py-1 rounded-full text-xs font-semibold
+                        {% if user.ativo %}bg-green-100 text-green-800
+                        {% else %}bg-red-100 text-red-800{% endif %}">
+                        {% if user.ativo %}
+                            <i class="fas fa-check-circle mr-1"></i>Ativo
+                        {% else %}
+                            <i class="fas fa-times-circle mr-1"></i>Inativo
+                        {% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        <div class="bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-white bg-opacity-30 rounded-lg">
+                    <i class="fas fa-shopping-bag text-2xl"></i>
+                </div>
+                <span class="text-3xl font-bold">{{ total_pedidos }}</span>
+            </div>
+            <p class="text-indigo-100 text-sm font-medium">Total de Pedidos</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-white bg-opacity-30 rounded-lg">
+                    <i class="fas fa-dollar-sign text-2xl"></i>
+                </div>
+                <span class="text-3xl font-bold">R$ {{ "%.2f"|format(total_gasto) }}</span>
+            </div>
+            <p class="text-green-100 text-sm font-medium">Total Gasto</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-white bg-opacity-30 rounded-lg">
+                    <i class="fas fa-clock text-2xl"></i>
+                </div>
+                <span class="text-3xl font-bold">{{ pedidos_pendentes }}</span>
+            </div>
+            <p class="text-yellow-100 text-sm font-medium">Pedidos Pendentes</p>
+        </div>
+
+        <div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl shadow-lg p-6 text-white">
+            <div class="flex items-center justify-between mb-4">
+                <div class="p-3 bg-white bg-opacity-30 rounded-lg">
+                    <i class="fas fa-check-circle text-2xl"></i>
+                </div>
+                <span class="text-3xl font-bold">{{ pedidos_entregues }}</span>
+            </div>
+            <p class="text-blue-100 text-sm font-medium">Pedidos Entregues</p>
+        </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-xl shadow-lg p-6">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Pedidos Recentes</h2>
+                    <a href="{{ url_for('customer.pedidos') }}" class="text-indigo-600 hover:text-indigo-700 font-medium">
+                        Ver todos <i class="fas fa-arrow-right ml-1"></i>
+                    </a>
+                </div>
+
+                {% if pedidos_recentes %}
+                <div class="space-y-4">
+                    {% for pedido in pedidos_recentes %}
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-all duration-200 hover:border-indigo-300">
+                        <div class="flex justify-between items-start">
+                            <div class="flex-1">
+                                <div class="flex items-center gap-3 mb-2">
+                                    <p class="font-bold text-gray-800">Pedido #{{ pedido.id }}</p>
+                                    <span class="px-3 py-1 rounded-full text-xs font-semibold
+                                        {% if pedido.status == 'pendente' %}bg-yellow-100 text-yellow-800
+                                        {% elif pedido.status == 'aprovado' %}bg-green-100 text-green-800
+                                        {% elif pedido.status == 'enviado' %}bg-blue-100 text-blue-800
+                                        {% elif pedido.status == 'entregue' %}bg-green-100 text-green-800
+                                        {% else %}bg-red-100 text-red-800{% endif %}">
+                                        {{ pedido.status|title }}
+                                    </span>
+                                </div>
+                                <p class="text-sm text-gray-600"><i class="far fa-calendar mr-1"></i> {{ pedido.criado_em }}</p>
+                                <p class="text-sm text-gray-600"><i class="far fa-box mr-1"></i> {{ pedido.total_itens }} item(s)</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xl font-bold text-indigo-600 mb-2">R$ {{ "%.2f"|format(pedido.total) }}</p>
+                                <a href="{{ url_for('customer.pedido_detalhes', id=pedido.id) }}" 
+                                   class="text-sm text-indigo-600 hover:text-indigo-700 font-medium">
+                                    Ver detalhes <i class="fas fa-chevron-right text-xs"></i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-12">
+                    <i class="fas fa-shopping-bag text-6xl text-gray-300 mb-4"></i>
+                    <p class="text-gray-600">Você ainda não fez nenhum pedido.</p>
+                    <a href="{{ url_for('shop.index') }}" class="inline-block mt-4 bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700 transition">
+                        Começar a comprar
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+                <h3 class="text-xl font-bold text-gray-800 mb-4">Minha Conta</h3>
+                <div class="space-y-4">
+                    <a href="{{ url_for('customer.configuracoes') }}" 
+                       class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition group">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-indigo-100 rounded-lg group-hover:bg-indigo-200 transition">
+                                <i class="fas fa-user text-indigo-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Configurações</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 group-hover:text-indigo-600 transition"></i>
+                    </a>
+
+                    <a href="{{ url_for('customer.pedidos') }}" 
+                       class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition group">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-green-100 rounded-lg group-hover:bg-green-200 transition">
+                                <i class="fas fa-box text-green-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Meus Pedidos</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 group-hover:text-green-600 transition"></i>
+                    </a>
+
+                    <a href="{{ url_for('customer.alterar_senha') }}" 
+                       class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition group">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-yellow-100 rounded-lg group-hover:bg-yellow-200 transition">
+                                <i class="fas fa-lock text-yellow-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Alterar Senha</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 group-hover:text-yellow-600 transition"></i>
+                    </a>
+
+                    <a href="{{ url_for('auth.logout') }}" 
+                       class="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition group">
+                        <div class="flex items-center gap-3">
+                            <div class="p-2 bg-red-100 rounded-lg group-hover:bg-red-200 transition">
+                                <i class="fas fa-sign-out-alt text-red-600"></i>
+                            </div>
+                            <span class="font-medium text-gray-700">Sair</span>
+                        </div>
+                        <i class="fas fa-chevron-right text-gray-400 group-hover:text-red-600 transition"></i>
+                    </a>
+                </div>
+            </div>
+
+            <div class="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg p-6 text-white">
+                <h3 class="text-lg font-bold mb-2">Precisa de Ajuda?</h3>
+                <p class="text-indigo-100 text-sm mb-4">Nossa equipe está pronta para atender você!</p>
+                <a href="{{ url_for('shop.index') }}" class="block w-full bg-white text-indigo-600 text-center py-2 rounded-lg font-medium hover:bg-indigo-50 transition">
+                    Fale Conosco
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

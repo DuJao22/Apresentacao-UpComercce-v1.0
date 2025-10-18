@@ -1,0 +1,109 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Meus Pedidos{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="mb-8">
+        <h1 class="text-3xl font-bold text-gray-800">Meus Pedidos</h1>
+        <p class="text-gray-600 mt-2">Acompanhe todos os seus pedidos</p>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-lg p-6 mb-6">
+        <div class="flex flex-wrap gap-3">
+            <a href="{{ url_for('customer.pedidos') }}" 
+               class="px-4 py-2 rounded-lg font-medium transition {% if not status_filter %}bg-indigo-600 text-white{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                Todos
+            </a>
+            <a href="{{ url_for('customer.pedidos', status='pendente') }}" 
+               class="px-4 py-2 rounded-lg font-medium transition {% if status_filter == 'pendente' %}bg-yellow-100 text-yellow-800 border border-yellow-300{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                Pendentes
+            </a>
+            <a href="{{ url_for('customer.pedidos', status='aprovado') }}" 
+               class="px-4 py-2 rounded-lg font-medium transition {% if status_filter == 'aprovado' %}bg-green-100 text-green-800 border border-green-300{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                Aprovados
+            </a>
+            <a href="{{ url_for('customer.pedidos', status='enviado') }}" 
+               class="px-4 py-2 rounded-lg font-medium transition {% if status_filter == 'enviado' %}bg-blue-100 text-blue-800 border border-blue-300{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                Enviados
+            </a>
+            <a href="{{ url_for('customer.pedidos', status='entregue') }}" 
+               class="px-4 py-2 rounded-lg font-medium transition {% if status_filter == 'entregue' %}bg-green-100 text-green-800 border border-green-300{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                Entregues
+            </a>
+            <a href="{{ url_for('customer.pedidos', status='cancelado') }}" 
+               class="px-4 py-2 rounded-lg font-medium transition {% if status_filter == 'cancelado' %}bg-red-100 text-red-800 border border-red-300{% else %}bg-gray-100 text-gray-700 hover:bg-gray-200{% endif %}">
+                Cancelados
+            </a>
+        </div>
+    </div>
+
+    {% if pedidos %}
+    <div class="space-y-4">
+        {% for pedido in pedidos %}
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-200">
+            <div class="p-6">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                    <div class="flex-1">
+                        <div class="flex items-center gap-3 mb-3">
+                            <h3 class="text-xl font-bold text-gray-800">Pedido #{{ pedido.id }}</h3>
+                            <span class="px-3 py-1 rounded-full text-xs font-semibold
+                                {% if pedido.status == 'pendente' %}bg-yellow-100 text-yellow-800
+                                {% elif pedido.status == 'aprovado' %}bg-green-100 text-green-800
+                                {% elif pedido.status == 'enviado' %}bg-blue-100 text-blue-800
+                                {% elif pedido.status == 'entregue' %}bg-green-100 text-green-800
+                                {% else %}bg-red-100 text-red-800{% endif %}">
+                                {{ pedido.status|title }}
+                            </span>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-sm text-gray-600">
+                            <div class="flex items-center gap-2">
+                                <i class="far fa-calendar text-indigo-600"></i>
+                                <span>{{ pedido.criado_em }}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="far fa-box text-indigo-600"></i>
+                                <span>{{ pedido.total_itens }} item(s)</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <i class="far fa-credit-card text-indigo-600"></i>
+                                <span>{{ pedido.metodo_pagamento|title }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-center gap-4">
+                        <div class="text-right">
+                            <p class="text-sm text-gray-600 mb-1">Total</p>
+                            <p class="text-2xl font-bold text-indigo-600">R$ {{ "%.2f"|format(pedido.total) }}</p>
+                        </div>
+                        <a href="{{ url_for('customer.pedido_detalhes', id=pedido.id) }}" 
+                           class="bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition font-medium flex items-center gap-2">
+                            Ver Detalhes
+                            <i class="fas fa-arrow-right"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white rounded-xl shadow-lg p-12 text-center">
+        <i class="fas fa-shopping-bag text-6xl text-gray-300 mb-4"></i>
+        <h3 class="text-xl font-bold text-gray-800 mb-2">Nenhum pedido encontrado</h3>
+        <p class="text-gray-600 mb-6">
+            {% if status_filter %}
+                Você não tem pedidos com o status "{{ status_filter }}".
+            {% else %}
+                Você ainda não fez nenhum pedido.
+            {% endif %}
+        </p>
+        <a href="{{ url_for('shop.index') }}" class="inline-block bg-indigo-600 text-white px-6 py-3 rounded-lg hover:bg-indigo-700 transition font-medium">
+            Começar a comprar
+        </a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

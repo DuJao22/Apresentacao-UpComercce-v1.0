@@ -1,0 +1,277 @@
+{% extends 'layouts/base.html' %}
+
+{% block title %}Configurações da Loja{% endblock %}
+
+{% block content %}
+<div class="bg-white shadow-md">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="flex justify-between items-center">
+            <h1 class="text-3xl font-bold text-gray-900">Configurações da Loja</h1>
+            <a href="{{ url_for('admin.dashboard') }}" class="text-indigo-600 hover:text-indigo-800">
+                <i class="fas fa-arrow-left mr-2"></i>Voltar ao Painel
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="bg-white shadow-md rounded-lg p-6">
+        <form method="POST" enctype="multipart/form-data" class="space-y-6">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            
+            <div>
+                <label for="logo" class="block text-sm font-medium text-gray-700 mb-2">
+                    <i class="fas fa-image mr-2 text-indigo-600"></i>Logo da Loja
+                </label>
+                {% if config and config.logo_path %}
+                <div class="mb-4 flex items-center space-x-4">
+                    <img src="{{ url_for('static', filename=config.logo_path) }}" alt="Logo atual" class="h-16 w-auto object-contain border border-gray-300 rounded-lg p-2">
+                    <span class="text-sm text-gray-600">Logo atual</span>
+                </div>
+                {% endif %}
+                <input type="file" id="logo" name="logo" accept="image/*"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <p class="mt-1 text-sm text-gray-500">
+                    Faça upload da logo da sua loja. Ela substituirá todos os ícones do sistema (cabeçalho, favicon, notificações). Formatos aceitos: PNG, JPG, JPEG, GIF, WEBP.
+                </p>
+            </div>
+
+            <div>
+                <label for="nome_loja" class="block text-sm font-medium text-gray-700 mb-2">
+                    Nome da Loja <span class="text-red-500">*</span>
+                </label>
+                <input type="text" id="nome_loja" name="nome_loja" required
+                       value="{{ config.nome_loja if config else 'E-Shop' }}"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <p class="mt-1 text-sm text-gray-500">Este nome aparecerá no cabeçalho e rodapé do site</p>
+            </div>
+
+            <div>
+                <label for="descricao_loja" class="block text-sm font-medium text-gray-700 mb-2">
+                    Descrição da Loja <span class="text-red-500">*</span>
+                </label>
+                <textarea id="descricao_loja" name="descricao_loja" required rows="3"
+                          class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">{{ config.descricao_loja if config else 'Sua loja online de perfumes, roupas e acessórios.' }}</textarea>
+                <p class="mt-1 text-sm text-gray-500">Esta descrição aparecerá no rodapé do site</p>
+            </div>
+
+            <div>
+                <label for="email_contato" class="block text-sm font-medium text-gray-700 mb-2">
+                    Email de Contato <span class="text-red-500">*</span>
+                </label>
+                <input type="email" id="email_contato" name="email_contato" required
+                       value="{{ config.email_contato if config else 'contato@eshop.com' }}"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <p class="mt-1 text-sm text-gray-500">Email que aparecerá na seção de contato</p>
+            </div>
+
+            <div>
+                <label for="telefone_contato" class="block text-sm font-medium text-gray-700 mb-2">
+                    Telefone de Contato <span class="text-red-500">*</span>
+                </label>
+                <input type="tel" id="telefone_contato" name="telefone_contato" required
+                       value="{{ config.telefone_contato if config else '(00) 0000-0000' }}"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <p class="mt-1 text-sm text-gray-500">Telefone que aparecerá na seção de contato</p>
+            </div>
+
+            <div>
+                <label for="endereco" class="block text-sm font-medium text-gray-700 mb-2">
+                    Endereço (Opcional)
+                </label>
+                <input type="text" id="endereco" name="endereco"
+                       value="{{ config.endereco if config and config.endereco else '' }}"
+                       class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <p class="mt-1 text-sm text-gray-500">Endereço físico da loja (opcional)</p>
+            </div>
+
+            <div class="border-t pt-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-percent mr-2 text-indigo-600"></i>Comissão de Vendas
+                </h3>
+                
+                <div>
+                    <label for="comissao_percentual" class="block text-sm font-medium text-gray-700 mb-2">
+                        Percentual de Comissão (%) <span class="text-red-500">*</span>
+                    </label>
+                    <input type="number" id="comissao_percentual" name="comissao_percentual" 
+                           min="0" max="100" step="0.1" required
+                           value="{{ config.comissao_percentual if config and config.comissao_percentual else '10.0' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <p class="mt-1 text-sm text-gray-500">
+                        Define o percentual de comissão que você ganha em cada venda. Valor entre 0% e 100%. Este valor será usado nos relatórios de faturamento.
+                    </p>
+                </div>
+            </div>
+
+            <div class="border-t pt-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-box mr-2 text-indigo-600"></i>Retirada no Local
+                </h3>
+                
+                <div>
+                    <label for="local_retirada" class="block text-sm font-medium text-gray-700 mb-2">
+                        Endereço para Retirada (Opcional)
+                    </label>
+                    <textarea id="local_retirada" name="local_retirada" rows="3"
+                              class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">{{ config.local_retirada if config and config.local_retirada else '' }}</textarea>
+                    <p class="mt-1 text-sm text-gray-500">
+                        Configure o endereço onde os clientes podem retirar os produtos. Se preenchido, a opção de retirada no local aparecerá no checkout.
+                    </p>
+                </div>
+            </div>
+
+            <div class="border-t pt-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-bell mr-2 text-indigo-600"></i>Notificações de Pedidos
+                </h3>
+                
+                <div>
+                    <label for="email_notificacao" class="block text-sm font-medium text-gray-700 mb-2">
+                        Email para Notificações (Opcional)
+                    </label>
+                    <input type="email" id="email_notificacao" name="email_notificacao"
+                           value="{{ config.email_notificacao if config and config.email_notificacao else '' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    <p class="mt-1 text-sm text-gray-500">
+                        Você receberá um email neste endereço sempre que um novo pedido for realizado, com todos os detalhes do cliente e do pedido.
+                    </p>
+                </div>
+            </div>
+
+            <div class="border-t pt-6">
+                <h3 class="text-lg font-semibold text-gray-800 mb-4">
+                    <i class="fas fa-credit-card mr-2 text-indigo-600"></i>Configuração Mercado Pago
+                </h3>
+                
+                <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <i class="fas fa-info-circle text-blue-400"></i>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm text-blue-700">
+                                <strong>Como obter suas credenciais:</strong>
+                            </p>
+                            <ol class="text-sm text-blue-700 mt-2 list-decimal list-inside space-y-1">
+                                <li>Acesse <a href="https://www.mercadopago.com/developers/panel" target="_blank" class="underline">Mercado Pago Developers</a></li>
+                                <li>Faça login na sua conta</li>
+                                <li>Vá em "Suas integrações" > "Credenciais"</li>
+                                <li>Copie seu Access Token e Public Key (use credenciais de teste para desenvolvimento)</li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="space-y-4">
+                    <div>
+                        <label for="mercadopago_access_token" class="block text-sm font-medium text-gray-700 mb-2">
+                            Access Token (Opcional)
+                        </label>
+                        <input type="text" id="mercadopago_access_token" name="mercadopago_access_token"
+                               value="{{ config.mercadopago_access_token if config and config.mercadopago_access_token else '' }}"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono text-sm"
+                               placeholder="APP_USR-...">
+                        <p class="mt-1 text-sm text-gray-500">
+                            Token de acesso do Mercado Pago para processar pagamentos
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <label for="mercadopago_public_key" class="block text-sm font-medium text-gray-700 mb-2">
+                            Public Key (Opcional)
+                        </label>
+                        <input type="text" id="mercadopago_public_key" name="mercadopago_public_key"
+                               value="{{ config.mercadopago_public_key if config and config.mercadopago_public_key else '' }}"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono text-sm"
+                               placeholder="APP_USR-...">
+                        <p class="mt-1 text-sm text-gray-500">
+                            Chave pública do Mercado Pago (necessária para processar pagamentos no frontend)
+                        </p>
+                    </div>
+                    
+                    <div>
+                        <label for="mercadopago_webhook_secret" class="block text-sm font-medium text-gray-700 mb-2">
+                            Webhook Secret (Opcional, mas Recomendado)
+                        </label>
+                        <input type="text" id="mercadopago_webhook_secret" name="mercadopago_webhook_secret"
+                               value="{{ config.mercadopago_webhook_secret if config and config.mercadopago_webhook_secret else '' }}"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:outline-none font-mono text-sm"
+                               placeholder="secret_key_...">
+                        <p class="mt-1 text-sm text-gray-500">
+                            Chave secreta para validar webhooks (obtenha em Webhooks > Configurar Notificações no painel do Mercado Pago)
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+                    </div>
+                    <div class="ml-3">
+                        <p class="text-sm text-yellow-700">
+                            <strong>Nota:</strong> O crédito "Desenvolvido por João Layon" permanecerá fixo no rodapé e não pode ser alterado.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end space-x-4">
+                <a href="{{ url_for('admin.dashboard') }}" 
+                   class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 hover:bg-gray-50">
+                    Cancelar
+                </a>
+                <button type="submit" 
+                        class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700">
+                    <i class="fas fa-save mr-2"></i>Salvar Configurações
+                </button>
+            </div>
+        </form>
+    </div>
+
+    <div class="bg-white shadow-md rounded-lg p-6 mt-8 border-2 border-red-200">
+        <h3 class="text-lg font-semibold text-red-800 mb-4">
+            <i class="fas fa-exclamation-triangle mr-2"></i>Zona de Perigo
+        </h3>
+        
+        <div class="bg-red-50 border-l-4 border-red-400 p-4 mb-4">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <i class="fas fa-exclamation-circle text-red-400"></i>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-red-700">
+                        <strong>ATENÇÃO:</strong> As ações abaixo são IRREVERSÍVEIS e podem resultar em perda de dados. Use com extrema cautela!
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <div class="border border-red-300 rounded-lg p-4 bg-red-50">
+            <h4 class="font-semibold text-gray-800 mb-2">
+                <i class="fas fa-database mr-2 text-red-600"></i>Resetar Banco de Dados de Produtos e Categorias
+            </h4>
+            <p class="text-sm text-gray-700 mb-4">
+                Esta ação irá desativar ou remover TODOS os produtos e categorias do banco de dados:
+                <br>• Produtos usados em pedidos anteriores: serão <strong>desativados</strong> (não aparecem no catálogo, mas mantêm os dados)
+                <br>• Produtos nunca comprados: serão <strong>deletados permanentemente</strong>
+                <br>• Categorias: serão <strong>desativadas</strong>
+                <br>• O histórico de pedidos será totalmente preservado
+            </p>
+            <p class="text-sm text-red-600 font-semibold mb-4">
+                ⚠️ Esta ação NÃO PODE ser desfeita! Certifique-se de ter um backup antes de prosseguir.
+            </p>
+            <form method="POST" action="{{ url_for('admin.resetar_produtos_categorias') }}" 
+                  onsubmit="return confirm('ATENÇÃO! Esta ação irá DELETAR TODOS os produtos e categorias do banco de dados de forma IRREVERSÍVEL.\n\nTodos os produtos, categorias, imagens e atributos serão removidos permanentemente.\n\nTem CERTEZA ABSOLUTA que deseja continuar?');">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <button type="submit" 
+                        class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2">
+                    <i class="fas fa-trash-alt mr-2"></i>Resetar Banco de Dados de Produtos e Categorias
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

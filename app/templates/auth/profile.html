@@ -1,0 +1,86 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Meu Perfil{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-8">Meu Perfil</h1>
+    
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div class="lg:col-span-1">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <div class="text-center mb-6">
+                    {% if user.foto_perfil %}
+                    <img src="{{ url_for('static', filename=user.foto_perfil) }}" class="w-32 h-32 rounded-full mx-auto object-cover mb-4">
+                    {% else %}
+                    <i class="fas fa-user-circle text-9xl text-gray-400 mb-4"></i>
+                    {% endif %}
+                    <h2 class="text-2xl font-bold text-gray-800">{{ user.nome }}</h2>
+                    <p class="text-gray-600">{{ user.email }}</p>
+                </div>
+                
+                <form method="POST" enctype="multipart/form-data">
+                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                    
+                    <div class="mb-4">
+                        <label for="nome" class="block text-gray-700 font-semibold mb-2">Nome</label>
+                        <input type="text" id="nome" name="nome" value="{{ user.nome }}" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="telefone" class="block text-gray-700 font-semibold mb-2">Telefone</label>
+                        <input type="tel" id="telefone" name="telefone" value="{{ user.telefone }}" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="foto_perfil" class="block text-gray-700 font-semibold mb-2">Foto de Perfil</label>
+                        <input type="file" id="foto_perfil" name="foto_perfil" accept="image/*"
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                    </div>
+                    
+                    <button type="submit" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700">
+                        Atualizar Perfil
+                    </button>
+                </form>
+            </div>
+        </div>
+        
+        <div class="lg:col-span-2">
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h3 class="text-2xl font-bold text-gray-800 mb-6">Meus Pedidos</h3>
+                
+                {% if pedidos %}
+                <div class="space-y-4">
+                    {% for pedido in pedidos %}
+                    <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <p class="font-semibold text-gray-800">Pedido #{{ pedido.id }}</p>
+                                <p class="text-sm text-gray-600">{{ pedido.criado_em }}</p>
+                                <p class="text-sm text-gray-600">{{ pedido.total_itens }} item(s)</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-xl font-bold text-indigo-600">R$ {{ "%.2f"|format(pedido.total) }}</p>
+                                <span class="px-3 py-1 rounded-full text-xs font-semibold
+                                    {% if pedido.status == 'pendente' %}bg-yellow-100 text-yellow-800
+                                    {% elif pedido.status == 'aprovado' %}bg-green-100 text-green-800
+                                    {% elif pedido.status == 'enviado' %}bg-blue-100 text-blue-800
+                                    {% elif pedido.status == 'entregue' %}bg-green-100 text-green-800
+                                    {% else %}bg-red-100 text-red-800{% endif %}">
+                                    {{ pedido.status|title }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <p class="text-gray-600 text-center py-8">Você ainda não fez nenhum pedido.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

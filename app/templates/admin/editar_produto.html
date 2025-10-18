@@ -1,0 +1,90 @@
+{% extends "layouts/base.html" %}
+
+{% block title %}Editar Produto{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-800 mb-8">Editar Produto</h1>
+    
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <form method="POST">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Categoria</label>
+                    <select name="categoria_id" required class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                        {% for cat in categorias %}
+                        <option value="{{ cat.id }}" {% if cat.id == produto.categoria_id %}selected{% endif %}>
+                            {{ cat.nome }}
+                        </option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Nome</label>
+                    <input type="text" name="nome" value="{{ produto.nome }}" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                </div>
+            </div>
+            
+            <div class="mb-4">
+                <label class="block text-gray-700 font-semibold mb-2">Descrição</label>
+                <textarea name="descricao" rows="3" required
+                          class="w-full px-4 py-2 border border-gray-300 rounded-lg">{{ produto.descricao }}</textarea>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Preço</label>
+                    <input type="number" name="preco" value="{{ produto.preco }}" step="0.01" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Estoque</label>
+                    <input type="number" name="quantidade_estoque" value="{{ produto.quantidade_estoque }}" required
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Peso (g)</label>
+                    <input type="text" name="peso" value="{{ produto.peso or '' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Dimensões</label>
+                    <input type="text" name="dimensoes" value="{{ produto.dimensoes or '' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-gray-700 font-semibold mb-2">Marca</label>
+                    <input type="text" name="marca" value="{{ produto.marca or '' }}"
+                           class="w-full px-4 py-2 border border-gray-300 rounded-lg">
+                </div>
+            </div>
+            
+            <div class="mb-6">
+                <label class="block text-gray-700 font-semibold mb-2">Imagens Atuais</label>
+                <div class="grid grid-cols-5 gap-2">
+                    {% for imagem in imagens %}
+                    <img src="{{ url_for('static', filename=imagem.caminho_imagem) }}" 
+                         class="w-full h-20 object-cover rounded">
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="flex space-x-4">
+                <button type="submit" class="bg-indigo-600 text-white px-6 py-2 rounded-lg hover:bg-indigo-700">
+                    Salvar Alterações
+                </button>
+                <a href="{{ url_for('admin.produtos') }}" 
+                   class="bg-gray-300 text-gray-700 px-6 py-2 rounded-lg hover:bg-gray-400">
+                    Cancelar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
