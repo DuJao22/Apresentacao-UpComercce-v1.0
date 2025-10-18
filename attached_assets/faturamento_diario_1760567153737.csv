@@ -1,0 +1,3 @@
+ID,Data,Cliente,Total,Status,Método Pagamento
+2,2025-10-15 22:19:35,Cliente Teste,R$ 500.00,em_separacao,pix
+1,2025-10-15 21:09:28,Cliente Teste,R$ 500.00,confirmado,pix
